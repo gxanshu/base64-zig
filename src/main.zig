@@ -4,7 +4,7 @@ const stdout = std.io.getStdOut().writer();
 
 const CommandType = enum { help, text, file, unknown };
 
-fn get_command_type(argument: []const u8) CommandType {
+fn getCommandType(argument: []const u8) CommandType {
     if (std.mem.eql(u8, argument, "-h") or std.mem.eql(u8, argument, "--help")) return CommandType.help;
     if (std.mem.eql(u8, argument, "--text")) return CommandType.text;
     if (std.mem.eql(u8, argument, "--file")) return CommandType.file;
@@ -22,15 +22,15 @@ pub fn main() !void {
 
     // check if we have enough params
     if (args.len < 2) {
-        try print_help();
+        try printHelp();
         return;
     }
 
-    const command = get_command_type(args[1]);
+    const command = getCommandType(args[1]);
 
     switch (command) {
         .help => {
-            try print_help();
+            try printHelp();
         },
         .file => {
             if (args.len < 3) {
@@ -38,7 +38,7 @@ pub fn main() !void {
                 return;
             }
 
-            try handle_file(args[2], allocator);
+            try handleFile(args[2], allocator);
         },
         .text => {
             if (args.len < 3) {
@@ -46,16 +46,16 @@ pub fn main() !void {
                 return;
             }
 
-            try handle_text(args[2], allocator);
+            try handleText(args[2], allocator);
         },
         .unknown => {
-            try print_help();
+            try printHelp();
         },
     }
 }
 
-fn print_help() !void {
-    const help_text =
+fn printHelp() !void {
+    const helpText =
         \\Usage:
         \\  --text <text>    Encode text (e.g., base64-zig --text "hello its gxanshu")
         \\  --file <path>    Encode file (e.g., base64-zig --file "/home/user/file.pdf")
@@ -63,11 +63,11 @@ fn print_help() !void {
         \\
     ;
 
-    try stdout.print("{s}\n", .{help_text});
+    try stdout.print("{s}\n", .{helpText});
 }
 
-fn handle_file(file_path: []const u8, allocator: std.mem.Allocator) !void {
-    const file = try std.fs.openFileAbsolute(file_path, .{ .mode = .read_only });
+fn handleFile(filePath: []const u8, allocator: std.mem.Allocator) !void {
+    const file = try std.fs.openFileAbsolute(filePath, .{ .mode = .read_only });
     defer file.close();
 
     // get file size
@@ -81,20 +81,20 @@ fn handle_file(file_path: []const u8, allocator: std.mem.Allocator) !void {
     _ = try file.readAll(content);
 
     const base64 = root.Base64.init();
-    const encoded_text = try base64.encode(content, allocator);
-    defer allocator.free(encoded_text);
+    const encodedText = try base64.encode(content, allocator);
+    defer allocator.free(encodedText);
 
-    try stdout.print("{s}\n", .{encoded_text});
+    try stdout.print("{s}\n", .{encodedText});
 }
 
-fn handle_text(text: []const u8, allocator: std.mem.Allocator) !void {
+fn handleText(text: []const u8, allocator: std.mem.Allocator) !void {
     if (text.len == 0) {
         std.debug.print("Please provide text", .{});
         return;
     }
 
     const base64 = root.Base64.init();
-    const encoded_text = try base64.encode(text, allocator);
-    defer allocator.free(encoded_text);
-    try stdout.print("{s}\n", .{encoded_text});
+    const encodedText = try base64.encode(text, allocator);
+    defer allocator.free(encodedText);
+    try stdout.print("{s}\n", .{encodedText});
 }
