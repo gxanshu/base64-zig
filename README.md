@@ -43,6 +43,8 @@ base64-zig -h
 # or
 base64-zig --help
 ```
+![image](https://github.com/user-attachments/assets/e5848045-1c01-41a8-9db0-a641eeb8265b)
+
 
 ### Library Usage
 
